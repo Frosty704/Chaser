@@ -1,0 +1,41 @@
+name: Build Chaser
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    name: Build Chaser with MSVC
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Clone JUCE
+      run: |
+        git clone --depth=1 https://github.com/juce-framework/JUCE.git juce
+
+    - name: Add JUCE to project folder
+      run: |
+        mkdir -Force External
+        Move-Item -Path juce -Destination External/JUCE
+
+    - name: Set up MSBuild
+      uses: microsoft/setup-msbuild@v1.1
+
+    - name: Generate Visual Studio project from .jucer
+      run: |
+        Start-Process -FilePath "External/JUCE/extras/Projucer/Builds/VisualStudio2022/Projucer.exe" -ArgumentList "--resave", "Chaser.jucer" -NoNewWindow -Wait
+
+    - name: Build Chaser.sln
+      run: msbuild Chaser.sln /p:Configuration=Release
+
+    - name: Upload Binaries
+      uses: actions/upload-artifact@v4
+      with:
+        name: Chaser-Build
+        path: |
+          Builds\VisualStudio*\x64\Release\*.dll
+          Builds\VisualStudio*\x64\Release\*.exe
