@@ -17,12 +17,12 @@ jobs:
       uses: microsoft/setup-msbuild@v1.1
 
     - name: Build Solution
-      run: msbuild Chaser.sln /p:Configuration=Release
+      run: msbuild Chaser/Builds/VisualStudio2013/Chaser.sln /p:Configuration=Release
 
     - name: Upload Binaries
       uses: actions/upload-artifact@v4
       with:
         name: Chaser-Build
         path: |
-          Builds\VisualStudio*\x64\Release\*.dll
-          Builds\VisualStudio*\x64\Release\*.exe
+          Chaser/Builds/VisualStudio2013/x64/Release/*.dll
+          Chaser/Builds/VisualStudio2013/x64/Release/*.exe
